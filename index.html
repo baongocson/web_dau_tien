@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng 20/10</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- CSS cho Video Background --- */
+        #bg-video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100; 
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover; 
+            filter: brightness(0.65); 
+        }
+        /* ---------------------------------- */
+
+        body{
+            min-height:100vh;
+            /* Đã xóa background-image */
+            font-family: "Arial Black", Arial, sans-serif; 
+            color: #FFFFFF; /* Màu chữ trắng để dễ đọc trên nền video */
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-direction:column;
+            text-align:center;
+            overflow:hidden;
+            padding:1rem;
+            position:relative;
+            font-size: 1.1rem; 
+        }
+
+        h1{
+           font-size: 2.6rem; 
+           margin-bottom:0.6rem;
+           z-index:2;
+           font-weight: bold;
+        }
+
+        #message{
+           font-size: 1.4rem; 
+           max-width:600px;
+           opacity:0;
+           transition:opacity .9s;
+           z-index:2;
+        }
+
+        /* --- CSS cho ảnh rơi --- */
+        .falling-img{
+            position:absolute;
+            top:-120px;
+            animation: fall linear forwards;
+            transition: transform .3s, filter .3s;
+            z-index:1;
+            cursor:pointer;
+            user-select:none;
+        }
+        .falling-img:hover{
+            transform: scale(1.4) rotate(15deg);
+            filter: brightness(1.15);
+            animation-play-state: paused;
+            z-index:3;
+        }
+        @keyframes fall{
+            0%{ transform: translateY(0) rotate(0deg); opacity:1; }
+            100%{ transform: translateY(150vh) rotate(360deg); opacity:.75; }
+        }
+        
+        #soundToggle {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 30;
+            padding: 8px 12px;
+            transition: transform .3s, background .3s;
+            user-select: none;
+            color: #FFFFFF;
+        }
+        #soundToggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* CẬP NHẬT MEDIA QUERY CHO KÍCH THƯỚC CHỮ LỚN HƠN */
+        @media (max-width:480px){
+            h1{
+                font-size: 1.4rem; 
+            }
+            #message{
+                font-size: 1.1rem; 
+            }
+
+            #soundToggle {
+                font-size: 1.5rem;
+                padding: 6px 10px;
+                bottom: 10px;
+                right: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="bg-video">
+        <source src="img/videoBackground1.mp4" type="video/mp4">
+        Trình duyệt của bạn không hỗ trợ video HTML5.
+    </video>
+
+    <h1>Quà 20/10 cho PChi :3</h1>
+    <p id="message"></p>
+
+    <audio id="bgm" src="img/henmotmai.mp3" loop preload="auto"></audio>
+
+    <div id="soundToggle">🔇</div>
+    
+    <script>
+        window.addEventListener('load', () => {
+            const messages = [
+                "Vườn anh trồng chủ yếu là hoa Nhìn em cười thế hóa là yêu",
+                "Chuyện cổ tích của anh là cuộc sống có em",
+                "Hạnh phúc có rất nhiều dạng và em là dạng đầu tiên",
+                "Người ta dùng từ dịu dàng để miêu tả em, anh dùng em để miêu tả sự dịu dàng",
+                "Anh phải lòng em mất rồi"
+            ];
+
+            const msgEl = document.getElementById('message');
+            let i = 0;
+            msgEl.style.opacity = 1;
+            setInterval(() => {
+                msgEl.style.opacity = 0;
+                setTimeout(() => {
+                    i = (i + 1) % messages.length;
+                    msgEl.textContent = messages[i];
+                    msgEl.style.opacity = 1;
+                }, 800);
+            }, 4800);
+            
+            // Cập nhật đường dẫn ảnh rơi
+            const falling = [];
+            for (let k = 1; k <= 12; k++) falling.push(`img/Anh (${k}).png`);
+            
+            // Mảng chứa đường dẫn file âm thanh tương ứng
+            const voices = [
+                "img/AudioTextToSpeech (1).mp3", 
+                "img/AudioTextToSpeech (2).mp3", 
+                "img/AudioTextToSpeech (3).mp3", 
+                "img/AudioTextToSpeech (4).mp3", 
+                "img/AudioTextToSpeech (5).mp3", 
+                "img/AudioTextToSpeech (6).mp3", 
+                "img/AudioTextToSpeech (7).mp3", 
+                "img/AudioTextToSpeech (8).mp3", 
+                "img/AudioTextToSpeech (9).mp3", 
+                "img/AudioTextToSpeech (10).mp3", 
+                "img/AudioTextToSpeech (11).mp3", 
+                "img/AudioTextToSpeech (12).mp3"
+            ];
+            
+            const activePositions = [];
+            function createFallingImage() {
+                let left;
+                const safe = 8;
+                const minDistance = 10;
+                let tries = 0;
+                do {
+                    left = safe + Math.random() * (100 - 2 * safe);
+                    tries++;
+                } while (activePositions.some(x => Math.abs(x - left) < minDistance) && tries < 20);
+
+                const randomIndex = Math.floor(Math.random() * falling.length);
+                
+                const el = document.createElement('img');
+                el.className = 'falling-img';
+                el.src = falling[randomIndex];
+                el.style.left = left + 'vw';
+                
+                // Gắn đường dẫn file âm thanh vào thuộc tính data-voice-src
+                el.setAttribute('data-voice-src', voices[randomIndex]); 
+
+                // THAY ĐỔI: Tăng kích thước ảnh rơi
+                let min = 95, max = 145; // Tăng từ 80-120 lên 95-145 (khoảng 20%)
+                if (window.innerWidth <= 480) { min = 50; max = 85; } // Tăng từ 40-70 lên 50-85
+                else if (window.innerWidth <= 768) { min = 75; max = 110; } // Tăng từ 60-90 lên 75-110
+                
+                el.style.width = (min + Math.random() * (max - min)) + 'px';
+                el.style.animationDuration = (8 + Math.random() * 4) + 's';
+                el.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+                
+                // Xử lý sự kiện nhấn (click) để phát âm thanh
+                el.addEventListener('click', function() {
+                    const src = this.getAttribute('data-voice-src');
+                    
+                    // Tạo một đối tượng Audio mới
+                    const audio = new Audio(src);
+                    
+                    // Phát âm thanh
+                    audio.play().catch(e => console.error("Lỗi phát âm thanh:", e));
+                    
+                    // Xóa đối tượng Audio sau khi phát xong (tùy chọn)
+                    audio.onended = () => {
+                        audio.remove();
+                    };
+                });
+
+                document.body.appendChild(el);
+                activePositions.push(left);
+
+                setTimeout(() => {
+                    el.remove();
+                    const idx = activePositions.indexOf(left);
+                    if (idx !== -1) activePositions.splice(idx, 1);
+                }, 14000);
+            }
+
+            setInterval(createFallingImage, 1100);
+
+            const bgm = document.getElementById('bgm');
+            const toggle = document.getElementById('soundToggle');
+            let playing = false;
+
+            toggle.addEventListener('click', async () => {
+                try {
+                    if (!playing) {
+                        bgm.currentTime = 68;
+                        await bgm.play();
+                        toggle.textContent = "🔈";
+                        playing = true;
+                    } else {
+                        bgm.pause();
+                        toggle.textContent = "🔇";
+                        playing = false;
+                    }
+                } catch (err) {
+                    console.log("Không thể phát", err);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
